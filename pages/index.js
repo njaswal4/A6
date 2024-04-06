@@ -1,9 +1,11 @@
 /**********************************************************************************
- *  WEB422 – Assignment 5* 
+ *  WEB422 – Assignment 6* 
  * I declare that this assignment is my own work in accordance with Seneca Academic Policy.*
  *  No part of this assignment has been copied manually or electronically from any other source*
  *  (including web sites) or distributed to other students.*
- * * Name: Nisarg Jaswal Student ID: 116088220 Date: 22/03/2024
+ * * Name: Nisarg Jaswal Student ID: 116088220 Date: 5/04/2024
+ * 
+ * Vercel App (Deployed) Link: https://a6-ie3xdqtm1-njaswal4s-projects.vercel.app/
  *********************************************************************************/
 import { Image, Row, Col } from "react-bootstrap";
 
