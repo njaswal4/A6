@@ -1,9 +1,8 @@
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { isAuthenticated } from '@/lib/authenticate';
 import { favouritesAtom, searchHistoryAtom } from '@/store';
-
 import { getFavourites, getHistory } from '@/lib/userData';
 
 const PUBLIC_PATHS = ['/login', '/', '/_error', '/register'];
@@ -15,28 +14,12 @@ export default function RouteGuard(props){
     const [favouritesList, setFavouritesList] = useAtom(favouritesAtom);
     const [searchHistory, setSearchHistory] = useAtom(searchHistoryAtom);
 
-    async function updateAtoms(){
+    const updateAtoms = useCallback(async () => {
         setFavouritesList(await getFavourites());
         setSearchHistory(await getHistory());
-    }
+    }, [setFavouritesList, setSearchHistory]);
 
-    useEffect(() => {
-        updateAtoms();
-        authCheck(router.pathname);
-
-        const handleRouteChange = (url) => {
-            const path = url.split('?')[0];
-            authCheck(path);
-        };
-
-        router.events.on('routeChangeComplete', handleRouteChange);
-
-        return () => {
-            router.events.off('routeChangeComplete', handleRouteChange);
-        };
-    }, [authCheck, router.events, router.pathname, updateAtoms]);
-
-    function authCheck(url){
+    const authCheck = useCallback((url) => {
         const path = url.split('?')[0];
         if(!isAuthenticated() && !PUBLIC_PATHS.includes(path)){
             setAuthorized(false);
@@ -45,7 +28,23 @@ export default function RouteGuard(props){
         else{
             setAuthorized(true);
         }
-    }
+    }, [router]);
+
+    useEffect(() => {
+        const handleRouteChange = (url) => {
+            const path = url.split('?')[0];
+            authCheck(path);
+        };
+
+        updateAtoms();
+        authCheck(router.pathname);
+
+        router.events.on('routeChangeComplete', handleRouteChange);
+
+        return () => {
+            router.events.off('routeChangeComplete', handleRouteChange);
+        };
+    }, [authCheck, router, updateAtoms]);
 
     return <>{authorized && props.children}</>;
 }
