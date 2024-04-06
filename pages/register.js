@@ -1,28 +1,29 @@
 import { Card, Form, Alert, Button } from "react-bootstrap";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { registerUser } from "../lib/authenticate";
 import { useRouter } from 'next/router';
-export default function Register(props) {
 
+export default function Register(props) {
   const [warning, setWarning] = useState("");
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const router = useRouter();
 
-
-
   async function handleSubmit(e) {
     e.preventDefault();
 
-    try{
-        await registerUser(user, password, password2);
-        
-        router.push("/login");
-    }catch(err){
-        setWarning(err.message);
-    }
+    console.log("Submitting registration form...");
 
+    try {
+      console.log("Calling registerUser function...");
+      await registerUser(user, password, password2);
+      console.log("Registration successful!");
+      router.push("/login");
+    } catch (err) {
+      console.error("Error during registration:", err);
+      setWarning(err.message);
+    }
   }
 
   return (
@@ -37,7 +38,7 @@ export default function Register(props) {
       <br />
 
       <Form onSubmit={handleSubmit}>
-        <Form.Group >
+        <Form.Group>
           <Form.Label>User:</Form.Label>
           <Form.Control type="text" value={user} id="userName" name="userName" onChange={e => setUser(e.target.value)} />
         </Form.Group>
