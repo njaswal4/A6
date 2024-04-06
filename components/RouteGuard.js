@@ -21,20 +21,24 @@ export default function RouteGuard(props){
     }
 
     useEffect(() => {
-        updateAtoms()
+        updateAtoms();
         authCheck(router.pathname);
 
-        router.events.on('routeChangeComplete', authCheck);
+        const handleRouteChange = (url) => {
+            const path = url.split('?')[0];
+            authCheck(path);
+        };
+
+        router.events.on('routeChangeComplete', handleRouteChange);
 
         return () => {
-            router.events.off('routeChangeComplete', authCheck);
+            router.events.off('routeChangeComplete', handleRouteChange);
         };
-    }, []);
+    }, [authCheck, router.events, router.pathname, updateAtoms]);
 
     function authCheck(url){
         const path = url.split('?')[0];
         if(!isAuthenticated() && !PUBLIC_PATHS.includes(path)){
-            //console.log(`trying to request a secure path: ${path}`);
             setAuthorized(false);
             router.push('/login');
         }
@@ -43,5 +47,5 @@ export default function RouteGuard(props){
         }
     }
 
-    return <>{authorized && props.children}</>
+    return <>{authorized && props.children}</>;
 }
